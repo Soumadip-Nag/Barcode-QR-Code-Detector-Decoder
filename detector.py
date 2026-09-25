@@ -291,7 +291,7 @@ def scan_image_bytes(image_bytes, use_ml=True):
                     y2 = min(h_img, int(y + h / 2) + pad)
                     boxes.append((x1, y1, x2, y2, label, conf, "ml"))
             except Exception as exc:
-                ml_error = str(exc)
+                ml_error = f"{type(exc).__name__}: {exc}"
             finally:
                 if os.path.exists(temp_path):
                     try:
