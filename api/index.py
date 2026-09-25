@@ -3,10 +3,12 @@ import os
 import sys
 
 # Vercel serverless has no writable HOME by default; several libs
-# (roboflow SDK, matplotlib, joblib) need one -> point them at /tmp.
-os.environ.setdefault("HOME", "/tmp")
+# (roboflow SDK reads $HOME at import, matplotlib, joblib) need one.
+if not os.environ.get("HOME"):
+    os.environ["HOME"] = "/tmp"
 os.environ.setdefault("XDG_CACHE_HOME", "/tmp")
 os.environ.setdefault("MPLCONFIGDIR", "/tmp")
+os.environ.setdefault("ROBOFLOW_CONFIG_DIR", "/tmp")
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 

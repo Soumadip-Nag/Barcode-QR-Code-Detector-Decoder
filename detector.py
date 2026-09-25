@@ -70,7 +70,9 @@ def get_model():
         _model = project.version(ROBOFLOW_VERSION).model
         return _model
     except Exception as exc:
-        _model_error = str(exc)
+        import traceback
+        traceback.print_exc()
+        _model_error = f"{type(exc).__name__}: {exc}"
         return None
 
 
