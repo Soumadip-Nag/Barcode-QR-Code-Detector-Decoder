@@ -8,7 +8,7 @@ if not os.environ.get("HOME"):
     os.environ["HOME"] = "/tmp"
 os.environ.setdefault("XDG_CACHE_HOME", "/tmp")
 os.environ.setdefault("MPLCONFIGDIR", "/tmp")
-os.environ.setdefault("ROBOFLOW_CONFIG_DIR", "/tmp")
+os.environ.setdefault("ROBOFLOW_CONFIG_DIR", "/tmp/roboflow-config.json")
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
