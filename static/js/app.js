@@ -82,7 +82,7 @@ snapBtn.addEventListener("click", async () => {
   setFile(new File([blob], "camera-frame.jpg", { type: "image/jpeg" }));
   setMode("upload");
   $("tabUpload").classList.add("active"); $("tabLive").classList.remove("active");
-};
+});
 
 /* ---------- scan ---------- */
 scanBtn.addEventListener("click", async () => {
