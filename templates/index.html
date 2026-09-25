@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barcode Reader — Scan a barcode</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="layout">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">|||</div>
+      <div><b>Barcode</b><span>Reader</span></div>
+    </div>
+    <p class="nav-label">WORKSPACE</p>
+    <nav class="nav">
+      <button class="nav-btn active" data-view="scanner">◧ &nbsp;Scanner <span class="dot"></span></button>
+      <button class="nav-btn" data-view="history">↻ &nbsp;Scan history</button>
+      <button class="nav-btn" data-view="catalog">▦ &nbsp;Product catalog</button>
+      <button class="nav-btn" data-view="analytics">▥ &nbsp;Analytics</button>
+    </nav>
+    <div class="side-foot">
+      <div class="engine"><i></i><span id="engineLabel">ZXing-Java engine</span></div>
+      <div class="side-sub">Barcodes &amp; QR codes<br>One workspace.</div>
+      <div class="side-sep"></div>
+      <button class="account" onclick="alert('Sign-in is demo-only in this build.')">◉ &nbsp;My account</button>
+      <div class="ver">BARCODE READER · 1.0</div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <div class="eyebrow">CAPTURE &amp; DECODE</div>
+    <div class="title-row">
+      <h1>Scan a barcode.</h1>
+      <div class="status-pill" id="statusPill"><i></i><span id="statusText">Ready to scan</span></div>
+    </div>
+    <p class="sub">Point your camera or drop an image. We'll read the rest.</p>
+
+    <!-- SCANNER VIEW -->
+    <section class="view active" id="view-scanner">
+      <div class="grid">
+        <div class="card">
+          <div class="scan-head">
+            <div class="tabs">
+              <button class="tab active" id="tabUpload">Image upload</button>
+              <button class="tab" id="tabLive">Live camera</button>
+            </div>
+            <div class="formats">13+ formats</div>
+          </div>
+          <div class="drop" id="drop">
+            <span class="corner tl"></span><span class="corner tr"></span>
+            <span class="corner bl"></span><span class="corner br"></span>
+            <div class="drop-hint" id="dropHint">
+              <b>Drop an image here, or click to browse</b><br><br>
+              JPG · PNG · WEBP · BMP — Roboflow YOLO finds the codes,<br>pyzxing (ZXing-Java) decodes them.
+            </div>
+            <img id="preview" alt="preview">
+            <video id="cam" autoplay playsinline width="640"></video>
+            <input type="file" id="fileInput" accept="image/*">
+          </div>
+          <div class="scan-foot">
+            <span class="ok" id="footStatus"><i style="width:8px;height:8px;border-radius:50%;background:#7fb069;display:inline-block"></i><span id="footText">No image yet — upload to begin</span></span>
+            <span>
+              <button class="link-btn" id="changeBtn">Change image</button> &nbsp;
+              <button class="btn" id="scanBtn">Scan now</button> &nbsp;
+              <button class="btn ghost" id="snapBtn" style="display:none">Capture frame</button>
+            </span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="results-head"><h3>Scan results</h3><span class="count" id="resCount">0</span></div>
+          <div class="results-body">
+            <div class="summary" id="summaryBox" style="display:none">
+              <span id="summaryText"></span>
+              <span class="row">
+                <button class="mini-btn" id="copyAllBtn">⧉ Copy all</button>
+                <button class="mini-btn" id="clearBtn">🗑 Clear</button>
+              </span>
+            </div>
+            <div id="emptyMsg" style="color:var(--muted);font-size:14px;text-align:center;padding:40px 10px">
+              Results will appear here after a scan.<br>Multiple codes in one photo are decoded simultaneously.
+            </div>
+            <div id="resList" style="display:flex;flex-direction:column;gap:14px"></div>
+          </div>
+          <div class="sign">Sign in to save scans across devices. <span id="dbNote">History is stored in MySQL.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTORY VIEW -->
+    <section class="view" id="view-history">
+      <div class="card" style="padding:22px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <h2 style="margin:0">Scan history</h2>
+          <button class="mini-btn" id="clearHistoryBtn">Clear all history</button>
+        </div>
+        <div style="overflow:auto"><table>
+          <thead><tr><th>ID</th><th>FILE</th><th>CODES</th><th>BARCODES</th><th>QR</th><th>WHEN</th></tr></thead>
+          <tbody id="historyBody"><tr><td colspan="6">Loading…</td></tr></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- CATALOG VIEW -->
+    <section class="view" id="view-catalog">
+      <div class="card" style="padding:22px">
+        <h2 style="margin-top:0">Product catalog</h2>
+        <div class="catalog-form">
+          <input id="pCode" placeholder="Barcode / QR value *" style="flex:2;min-width:200px">
+          <input id="pName" placeholder="Product name" style="flex:2;min-width:160px">
+          <input id="pBrand" placeholder="Brand" style="flex:1;min-width:120px">
+          <input id="pCat" placeholder="Category" style="flex:1;min-width:120px">
+          <button class="btn" id="addProductBtn">Add</button>
+          <input id="catSearch" placeholder="Search…" style="flex:1;min-width:140px">
+        </div>
+        <div style="overflow:auto"><table>
+          <thead><tr><th>CODE</th><th>NAME</th><th>BRAND</th><th>CATEGORY</th></tr></thead>
+          <tbody id="catalogBody"><tr><td colspan="4">Loading…</td></tr></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ANALYTICS VIEW -->
+    <section class="view" id="view-analytics">
+      <div class="stat-grid">
+        <div class="stat"><b id="stScans">–</b><span>Total scans</span></div>
+        <div class="stat"><b id="stCodes">–</b><span>Total codes decoded</span></div>
+        <div class="stat"><b id="stMix">–</b><span>Barcodes / QR</span></div>
+        <div class="stat"><b id="stRate">–</b><span>Decode success rate</span></div>
+      </div>
+      <div class="card" style="padding:22px">
+        <h3 style="margin-top:0">Recent scans</h3>
+        <div style="overflow:auto"><table>
+          <thead><tr><th>ID</th><th>FILE</th><th>CODES</th><th>WHEN</th></tr></thead>
+          <tbody id="analyticsBody"><tr><td colspan="4">Loading…</td></tr></tbody>
+        </table></div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
