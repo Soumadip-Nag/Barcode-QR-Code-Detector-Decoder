@@ -50,6 +50,25 @@ except Exception:
     _pyzbar_decode = None
     PYZBAR_AVAILABLE = False
 
+# No-Java decoder: ZXing-C++ port with prebuilt wheels.
+# This is what decodes 1D barcodes on hosts without Java (e.g. Vercel).
+try:
+    import zxingcpp as _zxingcpp
+    ZXINGCPP_AVAILABLE = True
+except Exception:
+    _zxingcpp = None
+    ZXINGCPP_AVAILABLE = False
+
+_parts = []
+if ZXING_AVAILABLE:
+    _parts.append("ZXing-Java engine (pyzxing)")
+if ZXINGCPP_AVAILABLE:
+    _parts.append("zxing-cpp")
+if PYZBAR_AVAILABLE:
+    _parts.append("pyzbar")
+_parts.append("OpenCV-QR")
+ZXING_ENGINE = " + ".join(_parts)
+
 _qr_detector = cv2.QRCodeDetector()
 
 _model = None
@@ -169,6 +188,26 @@ def decode_with_zxing(image):
                 os.remove(temp_path)
             except OSError:
                 pass
+
+
+def decode_with_zxingcpp(image):
+    """No-Java decoder (ZXing-C++ port). Returns pyzxing-shaped dicts."""
+    if not ZXINGCPP_AVAILABLE or _zxingcpp is None:
+        return []
+    try:
+        gray = (cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                if len(image.shape) == 3 else image)
+        out = []
+        for b in _zxingcpp.read_barcodes(gray):
+            text = convert_to_text(b.text)
+            if text:
+                fmt = convert_to_text(b.format)
+                out.append({"parsed": text, "raw": text,
+                            "format": fmt, "type": fmt})
+        return out
+    except Exception as e:
+        print("zxing-cpp Error:", e)
+        return []
 
 
 def _fallback_decode_opencv(image):
@@ -323,7 +362,8 @@ def scan_image_bytes(image_bytes, use_ml=True):
         for img in variants:
             for angle in (0, 90, 180, 270):
                 rotated = rotate_image(img, angle)
-                for obj in decode_with_zxing(rotated):
+                for obj in (decode_with_zxing(rotated)
+                              + decode_with_zxingcpp(rotated)):
                     parsed = obj.get("parsed")
                     raw = obj.get("raw")
                     text = convert_to_text(parsed if parsed else raw)
