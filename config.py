@@ -37,6 +37,10 @@ if not DATABASE_URL:
             f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}"
             f"@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
         )
+    elif _get("VERCEL", ""):
+        # Vercel serverless FS is read-only except /tmp: ephemeral sqlite
+        # unless a hosted MySQL DATABASE_URL is provided.
+        DATABASE_URL = "sqlite:////tmp/barcode.db"
     else:
         DATABASE_URL = "sqlite:///barcode.db"
 
